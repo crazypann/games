@@ -8,7 +8,7 @@ function initGame(resetLives = true) {
     snake = [{ x: 9 * box, y: 10 * box }];
     direction = null;
     food = randomPosition();
-    score = 0;
+    if (resetLives) score = 0;
     gameOver = false;
     if (resetLives) lives = 3;
     // Load high score from localStorage
