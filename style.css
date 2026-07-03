@@ -133,3 +133,33 @@ h1 {
     color: #0f172a;
     box-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
 }
+
+/* --- MOBILE RESPONSIVENESS --- */
+
+#gameCanvas {
+    /* Existing styles... */
+    max-width: 100%; /* Ensures canvas shrinks on small screens */
+    height: auto;    /* Keeps the aspect ratio perfectly square */
+    touch-action: none; /* Disables double-tap to zoom or browser panning */
+}
+
+/* Adjust layout for screens smaller than 500px */
+@media (max-width: 500px) {
+    .game-container {
+        padding: 15px;
+        width: 90vw; 
+    }
+
+    .dashboard {
+        flex-wrap: wrap; /* Allows dashboard items to stack if cramped */
+        gap: 10px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    .difficulty-controls {
+        flex-wrap: wrap;
+    }
+}

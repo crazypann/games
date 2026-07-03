@@ -228,5 +228,64 @@ diffButtons.forEach(button => {
     });
 });
 
+// --- MOBILE SWIPE CONTROLS ---
+let touchStartX = 0;
+let touchStartY = 0;
+
+// Listen for the start of a touch
+canvas.addEventListener('touchstart', function(e) {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+}, { passive: false });
+
+// Prevent scrolling when swiping on the canvas
+canvas.addEventListener('touchmove', function(e) {
+    e.preventDefault(); 
+}, { passive: false });
+
+// Listen for the end of a touch
+canvas.addEventListener('touchend', function(e) {
+    let touchEndX = e.changedTouches[0].screenX;
+    let touchEndY = e.changedTouches[0].screenY;
+    handleSwipe(touchStartX, touchStartY, touchEndX, touchEndY);
+}, { passive: false });
+
+function handleSwipe(startX, startY, endX, endY) {
+    // Don't register swipes if the game is over or direction just changed
+    if (gameOver || changingDirection) return;
+
+    let deltaX = endX - startX;
+    let deltaY = endY - startY;
+    
+    // Require a minimum swipe distance (e.g., 30px) to ignore accidental taps
+    if (Math.abs(deltaX) < 30 && Math.abs(deltaY) < 30) return;
+
+    const goingUp = direction === 'UP';
+    const goingDown = direction === 'DOWN';
+    const goingRight = direction === 'RIGHT';
+    const goingLeft = direction === 'LEFT';
+
+    // Check if the swipe was mostly horizontal or mostly vertical
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        // Horizontal swipe
+        if (deltaX > 0 && !goingLeft) {
+            direction = 'RIGHT';
+            changingDirection = true;
+        } else if (deltaX < 0 && !goingRight) {
+            direction = 'LEFT';
+            changingDirection = true;
+        }
+    } else {
+        // Vertical swipe
+        if (deltaY > 0 && !goingUp) {
+            direction = 'DOWN';
+            changingDirection = true;
+        } else if (deltaY < 0 && !goingDown) {
+            direction = 'UP';
+            changingDirection = true;
+        }
+    }
+}
+
 // Initialize the game on load
 initGame();
