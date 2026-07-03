@@ -1,25 +1,42 @@
-
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const box = 20;
+
 let snake, direction, food, score, game, gameOver, lives, highScore;
+let changingDirection = false; // Prevents rapid double-key self-collision
+
+// Difficulty / level state
+let baseSpeed = 600; // Tracks the selected difficulty setting
+let speed = baseSpeed; 
+let level = 1;
+const LEVEL_TARGET = 30;
 
 function initGame(resetLives = true) {
     snake = [{ x: 9 * box, y: 10 * box }];
     direction = null;
+    changingDirection = false;
     food = randomPosition();
-    if (resetLives) score = 0;
     gameOver = false;
-    if (resetLives) lives = 3;
+    
+    if (resetLives) {
+        score = 0;
+        lives = 3;
+        level = 1;
+        speed = baseSpeed; // Uses selected difficulty
+    }
+    
     // Load high score from localStorage
     highScore = parseInt(localStorage.getItem('snakeHighScore') || '0', 10);
-    document.getElementById('score').textContent = 'Score: ' + score;
-    document.getElementById('highscore').textContent = 'High Score: ' + highScore;
-    document.getElementById('lives').textContent = 'Lives: ' + lives;
+    
+    // Update Dashboard UI
+    document.getElementById('score').textContent = score;
+    document.getElementById('highscore').textContent = highScore;
+    document.getElementById('lives').textContent = lives;
+    document.getElementById('level').textContent = level;
+    
     if (game) clearInterval(game);
-    game = setInterval(draw, 600); // Slow for kids
+    game = setInterval(draw, speed);
 }
-
 
 function randomPosition() {
     let pos;
@@ -32,107 +49,184 @@ function randomPosition() {
     return pos;
 }
 
-
 document.addEventListener('keydown', (e) => {
-    if (gameOver) return;
-    if (e.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
-    else if (e.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
-    else if (e.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
-    else if (e.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
+    if (gameOver || changingDirection) return;
+    
+    const key = e.key;
+    const goingUp = direction === 'UP';
+    const goingDown = direction === 'DOWN';
+    const goingRight = direction === 'RIGHT';
+    const goingLeft = direction === 'LEFT';
+
+    if (key === 'ArrowLeft' && !goingRight) {
+        direction = 'LEFT';
+        changingDirection = true;
+    }
+    if (key === 'ArrowUp' && !goingDown) {
+        direction = 'UP';
+        changingDirection = true;
+    }
+    if (key === 'ArrowRight' && !goingLeft) {
+        direction = 'RIGHT';
+        changingDirection = true;
+    }
+    if (key === 'ArrowDown' && !goingUp) {
+        direction = 'DOWN';
+        changingDirection = true;
+    }
 });
 
 document.getElementById('restartBtn').addEventListener('click', () => {
-    initGame();
+    initGame(true);
 });
 
-
-
 function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Reset changingDirection flag at the start of a new frame
+    changingDirection = false;
+    
+    // Only process movement if a direction is set
+    if (direction) {
+        // Calculate new head position
+        let head = { ...snake[0] };
+        if (direction === 'LEFT') head.x -= box;
+        if (direction === 'UP') head.y -= box;
+        if (direction === 'RIGHT') head.x += box;
+        if (direction === 'DOWN') head.y += box;
 
-    // Don't move the snake until a direction is set
-    if (!direction) {
-        // Draw snake
-        for (let i = 0; i < snake.length; i++) {
-            ctx.fillStyle = i === 0 ? '#0f0' : '#fff';
-            ctx.fillRect(snake[i].x, snake[i].y, box, box);
+        // Check collision BEFORE rendering the new head
+        let crashed = false;
+        if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
+            crashed = true;
         }
-        // Draw food
-        ctx.fillStyle = '#f00';
-        ctx.fillRect(food.x, food.y, box, box);
-        return;
+        if (!crashed && snake.some(segment => segment.x === head.x && segment.y === head.y)) {
+            crashed = true;
+        }
+
+        if (crashed) {
+            handleCrash();
+            return;
+        }
+
+        // Move the snake
+        snake.unshift(head);
+
+        // Check if snake eats food
+        if (head.x === food.x && head.y === food.y) {
+            handleFoodEaten();
+        } else {
+            snake.pop(); // Remove tail if no food eaten
+        }
     }
 
-    // Move snake: calculate new head position
-    let head = { ...snake[0] };
-    if (direction === 'LEFT') head.x -= box;
-    if (direction === 'UP') head.y -= box;
-    if (direction === 'RIGHT') head.x += box;
-    if (direction === 'DOWN') head.y += box;
+    // DRAW EVERYTHING AFTER UPDATING THE LOGIC
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawGameElements();
+}
 
-    // Add new head to the snake
-    snake.unshift(head);
-
-    // Check collision with wall or self AFTER adding head
-    let crashed = false;
-    if (
-        head.x < 0 || head.x >= canvas.width ||
-        head.y < 0 || head.y >= canvas.height
-    ) {
-        crashed = true;
-    }
-    if (
-        !crashed && snake.length > 1 &&
-        snake.slice(1).some(segment => segment.x === head.x && segment.y === head.y)
-    ) {
-        crashed = true;
-    }
-
+function drawGameElements() {
     // Draw snake
     for (let i = 0; i < snake.length; i++) {
-        ctx.fillStyle = i === 0 ? '#0f0' : '#fff';
-        ctx.fillRect(snake[i].x, snake[i].y, box, box);
+        ctx.fillStyle = i === 0 ? '#4ade80' : '#86efac'; // Neon green head, lighter green body
+        ctx.fillRect(snake[i].x, snake[i].y, box - 2, box - 2); // Added minor gap for retro look
     }
     // Draw food
-    ctx.fillStyle = '#f00';
-    ctx.fillRect(food.x, food.y, box, box);
+    ctx.fillStyle = '#f87171';
+    ctx.fillRect(food.x, food.y, box - 2, box - 2);
+}
 
-    if (crashed) {
-        clearInterval(game);
-        lives--;
-        document.getElementById('lives').textContent = 'Lives: ' + lives;
-        // Update high score if needed
-        if (score > highScore) {
-            highScore = score;
-            localStorage.setItem('snakeHighScore', highScore);
-            document.getElementById('highscore').textContent = 'High Score: ' + highScore;
-        }
-        if (lives > 0) {
-            setTimeout(() => {
-                alert('Oops! You crashed! Lives left: ' + lives);
-                // Restart round, keep score and lives
-                initGame(false);
-            }, 50);
-        } else {
-            gameOver = true;
-            setTimeout(() => {
-                alert('Game Over! Your score: ' + score + '\nHigh Score: ' + highScore);
-            }, 50);
-        }
-        return;
+// function handleCrash() {
+//     clearInterval(game);
+//     lives--;
+//     document.getElementById('lives').textContent = lives;
+    
+//     // Update high score
+//     if (score > highScore) {
+//         highScore = score;
+//         localStorage.setItem('snakeHighScore', highScore);
+//         document.getElementById('highscore').textContent = highScore;
+//     }
+    
+//     if (lives > 0) {
+//         setTimeout(() => {
+//             alert('Oops! You crashed! Lives left: ' + lives);
+//             initGame(false); // Game now actually restarts and keeps current score!
+//         }, 50);
+//     } else {
+//         gameOver = true;
+//         setTimeout(() => {
+//             alert('Game Over! Your score: ' + score + '\nHigh Score: ' + highScore);
+//         }, 50);
+//     }
+// }
+
+function handleCrash() {
+    clearInterval(game);
+    lives--;
+    document.getElementById('lives').textContent = lives;
+    
+    // Update high score
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('snakeHighScore', highScore);
+        document.getElementById('highscore').textContent = highScore;
     }
-
-    // Check if snake eats food
-    if (head.x === food.x && head.y === food.y) {
-        score++;
-        document.getElementById('score').textContent = 'Score: ' + score;
-        food = randomPosition();
-        // Do not remove tail, snake grows
+    
+    if (lives > 0) {
+        setTimeout(() => {
+            alert('Oops! You crashed! Lives left: ' + lives);
+            
+            // Reset direction so the snake pauses and waits for new input
+            direction = null;
+            
+            // Restart the game interval without calling initGame()
+            game = setInterval(draw, speed); 
+        }, 50);
     } else {
-        // Remove tail
-        snake.pop();
+        gameOver = true;
+        setTimeout(() => {
+            alert('Game Over! Your score: ' + score + '\nHigh Score: ' + highScore);
+        }, 50);
     }
 }
 
-// Start the game initially
+function handleFoodEaten() {
+    score++;
+    document.getElementById('score').textContent = score;
+    food = randomPosition();
+    
+    // Check level-up
+    if (snake.length >= LEVEL_TARGET) {
+        const clearedLevel = level;
+        level++;
+        document.getElementById('level').textContent = level;
+        speed = Math.round(speed * 0.8);
+        
+        clearInterval(game);
+        setTimeout(() => {
+            alert('Congratulations! You cleared level ' + clearedLevel + '!\nLevel ' + level + ' starts now.');
+            initGame(false); // Reset board for next level
+        }, 50);
+    }
+}
+
+// Difficulty Button Logic
+const diffButtons = document.querySelectorAll('.diff-btn');
+
+diffButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+        // Remove active class from all buttons
+        diffButtons.forEach(btn => btn.classList.remove('active'));
+        
+        // Add active class to clicked button
+        e.target.classList.add('active');
+        
+        // Update the base speed based on the button's data attribute
+        baseSpeed = parseInt(e.target.getAttribute('data-speed'), 10);
+        
+        // Restart the game automatically to apply the new difficulty
+        initGame(true);
+    });
+});
+
+// Initialize the game on load
 initGame();

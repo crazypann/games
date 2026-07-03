@@ -1,22 +1,135 @@
+/* Base Reset and Body Styling */
 body {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
-    background: #222;
-    color: #fff;
-    font-family: Arial, sans-serif;
+    background: #0f172a; /* Sleek dark blue/gray */
+    color: #e2e8f0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Main Container */
+.game-container {
+    background: #1e293b;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+/* Typography */
+h1 {
+    margin: 0 0 20px 0;
+    color: #4ade80; /* Neon green */
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+}
+
+/* Dashboard Layout */
+.dashboard {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+    background: #0f172a;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #334155;
+}
+
+.stat-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 70px;
+}
+
+.stat-box .label {
+    font-size: 0.75em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    margin-bottom: 5px;
+}
+
+.stat-box .value {
+    font-size: 1.25em;
+    font-weight: bold;
+    color: #fff;
+}
+
+#lives {
+    color: #f87171; /* Soft red for lives */
+}
+
+/* Canvas Styling */
 #gameCanvas {
-    background: #111;
-    border: 2px solid #fff;
+    background: #000;
+    border: 2px solid #334155;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    display: block;
+    margin: 0 auto;
+}
+
+/* Button Controls */
+.controls {
+    margin-top: 25px;
+}
+
+#restartBtn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1em;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#restartBtn:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+#restartBtn:active {
+    transform: translateY(0);
+}
+
+/* Difficulty Button Controls */
+.difficulty-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
     margin-top: 20px;
 }
 
-#score {
-    font-size: 1.5em;
-    margin-top: 10px;
+.diff-btn {
+    background: #334155;
+    color: #e2e8f0;
+    border: 2px solid transparent;
+    padding: 8px 16px;
+    font-size: 0.9em;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+}
+
+.diff-btn:hover {
+    background: #475569;
+}
+
+.diff-btn.active {
+    background: #4ade80; /* Neon green to match heading */
+    color: #0f172a;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
 }
