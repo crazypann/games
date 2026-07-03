@@ -31,7 +31,7 @@
 
         <canvas id="gameCanvas" width="400" height="400"></canvas>
         
-        <!-- NEW: Difficulty Button Group -->
+        <!-- Difficulty Button Group -->
         <div class="difficulty-controls">
             <button id="btnEasy" class="diff-btn active" data-speed="600">Easy</button>
             <button id="btnMedium" class="diff-btn" data-speed="300">Medium</button>
@@ -41,6 +41,14 @@
         <div class="controls">
             <button id="pauseBtn">Pause</button>
             <button id="restartBtn">Restart Game</button>
+        </div>
+
+        <!-- On-Screen D-Pad -->
+        <div class="d-pad" id="dPad">
+            <button id="btnUp" class="d-btn up">▲</button>
+            <button id="btnLeft" class="d-btn left">◄</button>
+            <button id="btnRight" class="d-btn right">►</button>
+            <button id="btnDown" class="d-btn down">▼</button>
         </div>
     </div>
     <script src="script.js"></script>

@@ -1,4 +1,4 @@
-/* Base Reset and Body Styling */
+/* --- BASE & TYPOGRAPHY --- */
 body {
     display: flex;
     flex-direction: column;
@@ -6,12 +6,19 @@ body {
     justify-content: center;
     min-height: 100vh;
     margin: 0;
-    background: #0f172a; /* Sleek dark blue/gray */
+    background: #0f172a; 
     color: #e2e8f0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Main Container */
+h1 {
+    margin: 0 0 20px 0;
+    color: #4ade80; 
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+}
+
+/* --- MAIN CONTAINERS --- */
 .game-container {
     background: #1e293b;
     padding: 30px;
@@ -20,15 +27,24 @@ body {
     text-align: center;
 }
 
-/* Typography */
-h1 {
-    margin: 0 0 20px 0;
-    color: #4ade80; /* Neon green */
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+#gameCanvas {
+    background: #000;
+    border: 2px solid #334155;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    display: block;
+    margin: 0 auto;
+    
+    /* Responsive sizing */
+    max-width: 100%; 
+    max-height: 45vh; 
+    aspect-ratio: 1 / 1; 
+    width: auto;
+    height: auto;
+    touch-action: none; 
 }
 
-/* Dashboard Layout */
+/* --- DASHBOARD --- */
 .dashboard {
     display: flex;
     justify-content: space-between;
@@ -61,83 +77,42 @@ h1 {
 }
 
 #lives {
-    color: #f87171; /* Soft red for lives */
+    color: #f87171; 
 }
 
-/* Canvas Styling */
-#gameCanvas {
-    background: #000;
-    border: 2px solid #334155;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    display: block;
-    margin: 0 auto;
-}
-
-/* Button Controls */
-.controls {
-    margin-top: 25px;
+/* --- BUTTON CONTROLS --- */
+.controls, .difficulty-controls {
     display: flex;
     justify-content: center;
-    gap: 15px; /* Adds space between the two buttons */
-}
-
-#pauseBtn {
-    background: #f59e0b; /* Amber/Orange */
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    font-size: 1em;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-#pauseBtn:hover {
-    background: #d97706;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
-}
-
-#pauseBtn:active {
-    transform: translateY(0);
-}
-
-/* Ensure restart button matches structure */
-#restartBtn {
-    background: #3b82f6;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    font-size: 1em;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-#restartBtn:hover {
-    background: #2563eb;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-}
-
-#restartBtn:active {
-    transform: translateY(0);
-}
-
-/* Difficulty Button Controls */
-.difficulty-controls {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
+    gap: 15px; 
     margin-top: 20px;
 }
+
+.difficulty-controls {
+    gap: 10px;
+}
+
+/* Shared Button Styles */
+#pauseBtn, #restartBtn {
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1em;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Unique Button Colors & Hovers */
+#pauseBtn { background: #f59e0b; }
+#pauseBtn:hover { background: #d97706; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); }
+#pauseBtn:active, #restartBtn:active { transform: translateY(0); }
+
+#restartBtn { background: #3b82f6; }
+#restartBtn:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
 
 .diff-btn {
     background: #334155;
@@ -152,75 +127,88 @@ h1 {
     text-transform: uppercase;
 }
 
-.diff-btn:hover {
-    background: #475569;
-}
-
+.diff-btn:hover { background: #475569; }
 .diff-btn.active {
-    background: #4ade80; /* Neon green to match heading */
+    background: #4ade80; 
     color: #0f172a;
     box-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
 }
 
-/* --- MOBILE RESPONSIVENESS --- */
-
-#gameCanvas {
-    background: #000;
-    border: 2px solid #334155;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    display: block;
-    margin: 0 auto;
-    
-    /* Make canvas shrink vertically and horizontally */
-    max-width: 100%; 
-    max-height: 45vh; /* Limits height to 45% of the screen */
-    aspect-ratio: 1 / 1; /* Forces it to stay a perfect square */
-    width: auto;
-    height: auto;
-    
-    /* Disables default browser actions like zooming or panning on the canvas */
-    touch-action: none; 
+/* --- ON-SCREEN D-PAD --- */
+.d-pad {
+    display: none; /* Hidden by default on desktop */
+    justify-content: center; /* Centers the grid neatly under the other buttons */
+    margin-top: 25px; /* Adds space between Restart button and D-Pad */
+    grid-template-columns: repeat(3, 50px);
+    grid-template-rows: repeat(3, 50px);
+    gap: 8px;
+    touch-action: none; /* Stop zooming when tapping quickly */
 }
 
-/* Adjust layout for smaller screens */
-@media (max-width: 600px), (max-height: 750px) {
-    body {
-        /* Re-enable scrolling just in case it's a very tiny screen */
-        overflow: auto; 
-    }
+.d-btn {
+    background: rgba(30, 41, 59, 0.85); 
+    color: #4ade80; 
+    border: 2px solid #334155;
+    border-radius: 12px;
+    font-size: 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
 
+.d-btn:active {
+    background: #4ade80;
+    color: #0f172a;
+}
+
+.d-btn.up { grid-column: 2; grid-row: 1; }
+.d-btn.left { grid-column: 1; grid-row: 2; }
+.d-btn.right { grid-column: 3; grid-row: 2; }
+.d-btn.down { grid-column: 2; grid-row: 3; }
+
+/* --- MEDIA QUERIES --- */
+@media (max-width: 800px), (pointer: coarse) {
+    .d-pad { display: grid; }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+    .d-pad {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        margin-top: 0; /* Remove the spacing from the buttons */
+        transform: scale(0.85); /* Shrinks the D-Pad slightly to fit small screens */
+        transform-origin: bottom right; 
+        z-index: 100;
+    }
+}
+
+@media (max-width: 600px), (max-height: 750px) {
+    body { overflow: auto; }
     .game-container {
         padding: 10px;
         width: 95vw; 
     }
-
     h1 {
         margin: 0 0 10px 0;
         font-size: 1.3em;
     }
-
     .dashboard {
         margin-bottom: 10px;
         padding: 10px;
         gap: 5px;
     }
-
-    .stat-box .value {
-        font-size: 1em;
-    }
-
-    .difficulty-controls {
+    .stat-box .value { font-size: 1em; }
+    .difficulty-controls, .controls {
         margin-top: 15px;
         flex-wrap: wrap;
     }
-
     .diff-btn {
         padding: 8px 12px;
         font-size: 0.8em;
-    }
-
-    .controls {
-        margin-top: 15px;
     }
 }
