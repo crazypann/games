@@ -4,6 +4,7 @@ const box = 20;
 
 let snake, direction, food, score, game, gameOver, lives, highScore;
 let changingDirection = false; // Prevents rapid double-key self-collision
+let isPaused = false;
 
 // Difficulty / level state
 let baseSpeed = 600; // Tracks the selected difficulty setting
@@ -17,6 +18,9 @@ function initGame(resetLives = true) {
     changingDirection = false;
     food = randomPosition();
     gameOver = false;
+    
+    // MUST reset here so restarted games don't stay frozen!
+    isPaused = false;
     
     if (resetLives) {
         score = 0;
@@ -33,6 +37,7 @@ function initGame(resetLives = true) {
     document.getElementById('highscore').textContent = highScore;
     document.getElementById('lives').textContent = lives;
     document.getElementById('level').textContent = level;
+    document.getElementById('pauseBtn').textContent = 'Pause';
     
     if (game) clearInterval(game);
     game = setInterval(draw, speed);
@@ -50,6 +55,11 @@ function randomPosition() {
 }
 
 document.addEventListener('keydown', (e) => {
+    // Check for pause keys first
+    if (e.key === ' ' || e.key === 'p' || e.key === 'P') {
+        togglePause();
+        return;
+    }
     if (gameOver || changingDirection) return;
     
     const key = e.key;
@@ -79,6 +89,9 @@ document.addEventListener('keydown', (e) => {
 document.getElementById('restartBtn').addEventListener('click', () => {
     initGame(true);
 });
+
+// Click listener for the new button
+document.getElementById('pauseBtn').addEventListener('click', togglePause);
 
 function draw() {
     // Reset changingDirection flag at the start of a new frame
@@ -209,6 +222,31 @@ function handleFoodEaten() {
     }
 }
 
+function togglePause() {
+    // Don't pause if the game is over, or if the snake hasn't started moving yet
+    if (gameOver || !direction) return; 
+
+    isPaused = !isPaused;
+    const pauseBtn = document.getElementById('pauseBtn');
+
+    if (isPaused) {
+        clearInterval(game); // Stop the game loop
+        pauseBtn.textContent = 'Resume';
+        
+        // Draw a dark transparent overlay and "PAUSED" text
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = '30px "Segoe UI"';
+        ctx.textAlign = 'center';
+        ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
+    } else {
+        game = setInterval(draw, speed); // Restart the loop
+        pauseBtn.textContent = 'Pause';
+    }
+}
+
 // Difficulty Button Logic
 const diffButtons = document.querySelectorAll('.diff-btn');
 
@@ -232,18 +270,18 @@ diffButtons.forEach(button => {
 let touchStartX = 0;
 let touchStartY = 0;
 
-// Listen for the start of a touch
+// Listen for the start of a touch ON THE CANVAS
 canvas.addEventListener('touchstart', function(e) {
     touchStartX = e.changedTouches[0].screenX;
     touchStartY = e.changedTouches[0].screenY;
 }, { passive: false });
 
-// Prevent scrolling when swiping on the canvas
+// Prevent scrolling ONLY when swiping inside the canvas
 canvas.addEventListener('touchmove', function(e) {
     e.preventDefault(); 
 }, { passive: false });
 
-// Listen for the end of a touch
+// Listen for the end of a touch ON THE CANVAS
 canvas.addEventListener('touchend', function(e) {
     let touchEndX = e.changedTouches[0].screenX;
     let touchEndY = e.changedTouches[0].screenY;
@@ -251,13 +289,12 @@ canvas.addEventListener('touchend', function(e) {
 }, { passive: false });
 
 function handleSwipe(startX, startY, endX, endY) {
-    // Don't register swipes if the game is over or direction just changed
     if (gameOver || changingDirection) return;
 
     let deltaX = endX - startX;
     let deltaY = endY - startY;
     
-    // Require a minimum swipe distance (e.g., 30px) to ignore accidental taps
+    // Ignore tiny accidental taps
     if (Math.abs(deltaX) < 30 && Math.abs(deltaY) < 30) return;
 
     const goingUp = direction === 'UP';
@@ -265,9 +302,7 @@ function handleSwipe(startX, startY, endX, endY) {
     const goingRight = direction === 'RIGHT';
     const goingLeft = direction === 'LEFT';
 
-    // Check if the swipe was mostly horizontal or mostly vertical
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        // Horizontal swipe
         if (deltaX > 0 && !goingLeft) {
             direction = 'RIGHT';
             changingDirection = true;
@@ -276,7 +311,6 @@ function handleSwipe(startX, startY, endX, endY) {
             changingDirection = true;
         }
     } else {
-        // Vertical swipe
         if (deltaY > 0 && !goingUp) {
             direction = 'DOWN';
             changingDirection = true;
