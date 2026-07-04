@@ -183,10 +183,13 @@ function handleFoodEaten() {
     document.getElementById('score').textContent = score;
     food = randomPosition();
     
-    if (snake.length >= LEVEL_TARGET) {
+    // Check level-up: Trigger exactly when the score is a multiple of LEVEL_TARGET (30)
+    if (score % LEVEL_TARGET === 0) {
         const clearedLevel = level;
         level++;
         document.getElementById('level').textContent = level;
+        
+        // Uncapped speed increase! Speed drops by 20% infinitely
         speed = Math.round(speed * 0.8);
         
         clearInterval(game);
